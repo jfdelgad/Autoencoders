@@ -79,13 +79,14 @@ for i in range(0,5):
 
 ```
 
-![Figure 1]https://github.com/jfdelgad/Autoencoders/blob/master/output_input.png
+![Figure 1](https://github.com/jfdelgad/Autoencoders/blob/master/output_input.png)
 
 where the first row of images show the output and the second the input. We can see that some information is lost but is possible to distinguish the digits.
 <br>
 
 We can take a look at the coefficients (weights) that the models learned. We are interested on the weights that map the input to the hidden layer. We have 32 set of 784 weights. The can be plotted doing:
 
+```python
 w = model.get_weights()
 
 for i in range(0,32):
@@ -95,6 +96,10 @@ for i in range(0,32):
     plt.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
+```
+
+![Figure 2](https://github.com/jfdelgad/Autoencoders/blob/master/weights.png)
+
 
 There is one set of coefficients related to ech hidden neuron. Each image then show the pattern in the input that will activate maximally each neuron in the hidden layer.
 

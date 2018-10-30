@@ -65,14 +65,14 @@ testData = testData.reshape((len(testData),28,28))
 
 for i in range(0,5):
     ax = plt.subplot(2,5,i + 1)
-    plt.imshow(tmp[i,:,:])
+    plt.imshow(output[i,:,:])
     plt.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
     
     ax = plt.subplot(2,5,i + 1 + 5)
-    plt.imshow(tmptest[i,:,:])
+    plt.imshow(testData[i,:,:])
     plt.gray()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)

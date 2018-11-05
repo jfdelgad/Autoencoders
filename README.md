@@ -220,18 +220,119 @@ model.compile(optimizer='rmsprop', loss='categorical_crossentropy',metrics=['acc
 #learn, use 10 perecnt for validation (just to see differences between training and testing performance)
 model.fit(trainData,trainLabels,batch_size=256,epochs=50, validation_split = 0.1)
 
-score = model.evaluate(testData,testLabels)#0.9745
+score = model.evaluate(testData,testLabels)# 0.9745
 ```
 
 This give us an accuracy in the test set of 97.8% not bad but far from being the state of the art. 
 
-The ide aof autoencoders is great, but having as fundament (as shown here) that the images can be compressed sounds pretty simple. We may explore particular patterns that appear in teh signal. We will need some filters that extract the features and allow us to produce a decomposition of the image in fundamental components.
+The idea of autoencoders is excellent, but having as fundament (as shown here) that the images can be compressed sounds pretty simple. We may explore particular patterns that appear in the signal. We will need some filters that extract the features and allow us to produce decomposition of the image in fundamental components.
 
 We can use convolutional neural networks, in our case, convolutional autoencoders.
 
 
+
 # Convolutional Autoencoders:
 
-To do.
+In convolutional autoencoders we try to represent a given inputs as a combination of general features extracted from the input itself. See [this](https://en.wikipedia.org/wiki/Convolutional_neural_network) for mor information. Now lets implement it.
+
+```python
+# create the network
+model = Sequential()
+
+# 1 convolutional layer, 32 filters
+model.add(Conv2D(32,(3,3), padding='same', activation='relu',input_shape=(trainData.shape[1],trainData.shape[2],1)))
+model.add(MaxPooling2D(pool_size=(2,2)))
+ 
+model.add(Conv2D(32,(3,3), padding='same', activation='relu'))
+model.add(UpSampling2D(size=(2,2)))
+model.add(Conv2D(1,(3,3), padding='same', activation='relu'))
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy')
+model.fit(trainData,trainData,batch_size=256,epochs=10, validation_split = 0.1)
+```
+
+we can now extract the output of the first layer to have an idea of what features are extracted:
+
+```python
+# create the network
+model = Sequential()
+
+# 3 convolutional layers, 32, 64 and 64 filters
+model.add(Conv2D(32,(3,3), padding='same', activation='relu',input_shape=(trainData.shape[1],trainData.shape[2],1)))
+model.add(MaxPooling2D(pool_size=(2,2)))
+ 
+model.add(Conv2D(32,(3,3), padding='same', activation='relu'))
+model.add(UpSampling2D(size=(2,2)))
+
+model.add(Conv2D(1,(3,3), padding='same', activation='relu'))
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy')
+model.fit(trainData,trainData,batch_size=256,epochs=10, validation_split = 0.1)
+
+```
+
+Lets see how well the signals are reconstructed:
+
+```python
+
+# predict the output
+output = model.predict(testData)
+tmp = output.reshape((len(output),28,28))
+tmptest = testData.reshape((len(testData),28,28))
+
+
+#%%
+for i in range(0,5):
+    ax = plt.subplot(2,5,i + 1)
+    plt.imshow(tmp[i,:,:])
+    plt.gray()
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    
+    ax = plt.subplot(2,5,i + 1 + 5)
+    plt.imshow(tmptest[i,:,:])
+    plt.gray()
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+```
+
+![Figure 3](https://github.com/jfdelgad/Autoencoders/blob/master/aeconv_1.png)
+
+We observe that the output is very similar to the original, which is expected as we have a rich set of features extracted from the input images (32 filters) there is no dimensionality reduction, in fact it is the opposite. The output of the hidden layer can be represented by 32 images each one is expected to highlight a (luckily) a different feature of the input signal. The features extracted from each filter can be visualized by finding the input that activates each neuron, for that some tools are available: [Keras-vis](https://github.com/raghakot/keras-vis)
+
+Let's keep it simple her. We can take a look at the output of the filters for a single input and see what the extracted features are. In order to generate the output of the hidden layer we can create a new model like this:
+
+```python
+encoder = Model(inputs=model.input,outputs=model.layers[0].output)
+encoded0 = encoder.predict(trainData)
+
+```
+
+and visualize the output:
+
+```python
+for i in range(0,32):
+    ax = plt.subplot(4,8,i + 1)
+    plt.imshow(encoded0[1,:,:,i])
+    plt.gray()
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
+    
+```
+
+The outputs for the first two inputs in the training data look like this:
+
+![Figure 4](https://github.com/jfdelgad/Autoencoders/blob/master/conv1.png)
+![Figure 4](https://github.com/jfdelgad/Autoencoders/blob/master/conv2.png)
+
+Notice that this gives the idea that the filters learn basic function like gradients and edge detection. Furthermore these operations seem to be performed in different directions. This of course is mere interpretation.
+
+The main idea is that the convolutional auto-encoder can be used to extract features that allow reconstruction of the images. Note that this is unsupervised and therefore is useful as a first steep when we want to perform classification.
+
+This will be all.
+
+Thanks for reading.
+
+
 
 

@@ -1,5 +1,5 @@
 # Autoencoders
-Implementing Auto-encoders
+Implementing (Deep)Auto-encoders with keeas and tensor-flow
 
 If you are not familiar with auto-encoders I recommend to read [this](http://ufldl.stanford.edu/tutorial/unsupervised/Autoencoders/). 
 
